@@ -3,3 +3,5 @@ pydantic-ai
 pydantic
 pandas
 openai
+python-dotenv
+aryn-sdk

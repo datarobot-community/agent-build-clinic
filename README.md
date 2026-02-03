@@ -1,12 +1,42 @@
 # Agentic AI Building Blocks
 
-This repository contains a series of 6 "Agentic Blocks"—modular notebooks designed to demonstrate how to build, enhance, and deploy a production-ready AI Agent using DataRobot.
+This repository contains a series of 7 "Agentic Blocks"—modular notebooks designed to demonstrate how to build, enhance, and deploy a production-ready AI Agent using DataRobot.
 
 The goal is to move beyond simple chatbots by equipping an agent with predictive forecasting, structured data querying, and document intelligence.
 
 ---
 
 ## Notebook Overview
+
+## Setup
+
+### Option A: DataRobot Codespace (recommended for these notebooks)
+
+1. Open the Codespace **Terminal**.
+2. Install dependencies from this repo:
+
+```bash
+pip install -r requirements.txt
+```
+
+3. If you installed via terminal, **restart the notebook kernel** (Kernel → Restart) to pick up newly installed packages.
+
+### Option B: Local Python / Jupyter
+
+1. Create and activate a virtual environment (recommended).
+2. Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+3. Ensure DataRobot credentials are available to the notebooks (for `dr.Client()`):
+   - `DATAROBOT_ENDPOINT`
+   - `DATAROBOT_API_TOKEN`
+   - Optional (used in some notebooks): `DATAROBOT_DEFAULT_USE_CASE`
+
+4. Optional (Document Intelligence / Aryn):
+   - `ARYN_API_KEY` (if not set, the PDF notebook will run in simulation mode)
 
 ### 1 - LLM Gateway
 **Goal:** Establish the foundation.
@@ -38,9 +68,28 @@ The goal is to move beyond simple chatbots by equipping an agent with predictive
 * Demonstrates how to save, version, and manage system prompts externally.
 * Allows business users to update the agent's tone or instructions without requiring a code redeployment.
 
+### 7 - Custom Traces
+xxx
+
 ---
 
 ## Getting Started
 1.  Open **Notebook 1** to authenticate and test your LLM connection.
 2.  Proceed sequentially to build up the agent's capabilities.
-3.  Ensure you have the necessary sample data (supplier_standards.pdf) uploaded for Notebook 4.
+3.  For the PDF demo notebook, ensure the sample PDF exists at `archive/ercot_market_briefing.pdf` (or update the notebook's `PDF_FILENAME`). The notebook will fall back to embedded sample text if the file/key are missing.
+
+---
+
+## Shared assets required to run the notebooks
+
+- **Python dependencies**: `requirements.txt`
+- **Core agent code**: `agent.py` (imported by the deployment packaging notebook)
+- **DataRobot assets (must exist in your tenant)**:
+  - Forecasting **deployment**: `6971b39b3fa6dde87d114a82`
+  - Forecasting **scoring dataset**: `6971bf6404e148a1b1b17c71`
+- **Deployment packaging folder**: `agent_artifacts/`
+  - Used/created by `6 - Deploy the Agent.ipynb`
+  - Expected to contain (and is overwritten/created by the notebook): `custom.py`, `agent.py`, `requirements.txt`, plus packaging metadata like `pyproject.toml`
+- **Sample PDF for Document Intelligence**: `archive/ercot_market_briefing.pdf`
+  - Used by `5 - PDF Onboarding (Aryn).ipynb`
+  - Optional: if missing (or if `ARYN_API_KEY` is not set), the notebook runs in a “simulation mode” using embedded fallback policy text
