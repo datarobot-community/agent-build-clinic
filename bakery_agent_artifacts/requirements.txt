@@ -1,5 +1,0 @@
-datarobot
-pydantic-ai
-pydantic
-pandas
-openai

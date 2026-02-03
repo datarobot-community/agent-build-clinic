@@ -1,0 +1,9 @@
+                                                                                                                                        
+[project]                                                                                                                                                                                                
+name = "Ercot-agent"                                                                                                                                                                                    
+version = "0.0.1"                                                                                                                                                                                        
+dependencies = [                                                                                                                                                                                         
+    "datarobot",                                                                                                                                                                                         
+    "pydantic",                                                                                                                                                                                          
+    "pydantic-ai",                                                                                                                                                                                       
+]                                                                                                                                                                                                        
