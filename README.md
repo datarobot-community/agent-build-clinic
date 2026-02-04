@@ -6,8 +6,6 @@ The goal is to move beyond simple chatbots by equipping an agent with predictive
 
 ---
 
-## Notebook Overview
-
 ## Setup
 
 ### Option A: DataRobot Codespace (recommended for these notebooks)
@@ -37,6 +35,10 @@ pip install -r requirements.txt
 
 4. Optional (Document Intelligence / Aryn):
    - `ARYN_API_KEY` (if not set, the PDF notebook will run in simulation mode)
+
+---
+
+## Notebook Overview
 
 ### 1 - LLM Gateway
 **Goal:** Establish the foundation.
