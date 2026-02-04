@@ -36,62 +36,102 @@ pip install -r requirements.txt
 4. Optional (Document Intelligence / Aryn):
    - `ARYN_API_KEY` (if not set, the PDF notebook will run in simulation mode)
 
+### Environment Variables
+
+Create a `.env` file in the repository root with the following variables:
+
+**For Codespace:**
+- Create `.env` in the workspace root
+- The file will be automatically loaded by the notebooks
+
+**For Local:**
+- Create `.env` in the project root directory
+- Ensure your notebook environment loads `.env` files (most Jupyter setups do this automatically)
+- **Note:** For local development, you'll also need to set `DATAROBOT_ENDPOINT` and `DATAROBOT_API_TOKEN` (these are typically set automatically in Codespace)
+
+**Quick Setup:**
+```bash
+# Copy the example file and fill in your values
+cp .env.example .env
+```
+
+**Required Variables:**
+See `.env.example` for the complete list. Key variables include:
+- `DATAROBOT_ENDPOINT` and `DATAROBOT_API_TOKEN` (required for local development)
+- `ERCOT_TRAINING_DATASET_ID` and `SCORING_BASE_DATASET_ID`
+- `FORECAST_DEPLOYMENT_ID` and `MCP_DEPLOYMENT_ID`
+
+Replace placeholder values with your actual DataRobot dataset and deployment IDs.
+
 ---
 
 ## Notebook Overview
 
 ### 1 - LLM Gateway
-**Goal:** Establish the foundation.
+**Goal:** Establish the foundation for the agent by connecting to the DataRobot LLM Gateway.
 * Connects to the DataRobot LLM Gateway.
 * Demonstrates how to access and switch between nearly 100 different LLMs (e.g., GPT-4, Claude, Gemini) using a single secure endpoint, eliminating the need to manage individual vendor API keys.
 
-### 2 - Advanced Data Tools
-**Goal:** Give the agent "Data Analyst" capabilities.
-* Uses the Model Context Protocol (MCP) to connect the agent to a DataRobot deployment acting as a data router.
-* Enables the agent to autonomously query structured data warehouses (like Snowflake) to answer factual questions (e.g., "Which bakeries are we tracking?").
+### 2 - Prompt Management
+**Goal:** Create, version, and programmatically retrieve a DataRobot Prompt Template.
+* Demonstrates how to save, version, and manage system prompts externally in DataRobot.
+* Allows business users to update the agent's tone or instructions without requiring a code redeployment.
+* Prompts are treated as managed, versioned assets (not hardcoded strings).
 
-### 3 - Predictive Tools
-**Goal:** Bridge Generative AI with Predictive AI.
+### 3 - Advanced Data Tools
+**Goal:** Empower the agent to query enterprise data warehouses (like Snowflake) to answer factual business questions.
+* Uses the Model Context Protocol (MCP) to connect the agent to a DataRobot deployment acting as a secure "Data Tool."
+* Enables the agent to dynamically generate queries and retrieve live datasets—transforming it from a simple chatbot into a data analyst capable of answering questions like "What distinct bakeries are we tracking supplies for?"
+
+### 4 - Forecast Agent Tools
+**Goal:** Use the DataRobot forecast model deployment as a tool.
 * Defines a custom Tool Client that wraps a DataRobot Time Series deployment.
 * Allows the agent to recognize forward-looking questions (e.g., "How many croissants will we sell next Friday?") and delegate them to a forecasting model for accurate numerical answers.
+* LLMs cannot predict the future, but DataRobot can—this bridges Generative AI with Predictive AI.
 
-### 4 - Document Intelligence
-**Goal:** Onboard unstructured knowledge (RAG).
-* Integrates the Aryn SDK to intelligently parse PDF documents (e.g., Supplier Quality Standards).
-* Injects this context into the agent, enabling it to answer specific compliance rules (e.g., "What is the maximum temp for butter deliveries?").
+### 5 - PDF Onboarding (Aryn)
+**Goal:** Enable the agent to answer questions from unstructured PDF documents.
+* Integrates the Aryn SDK (DataRobot's partner for document intelligence) to intelligently parse and chunk PDF documents.
+* Implements a RAG (Retrieval Augmented Generation) workflow, allowing the agent to retrieve relevant excerpts and answer questions grounded in the document.
+* Example: Answer questions from ERCOT market briefing PDFs.
 
-### 5 - Deploy and Evaluate
-**Goal:** Move from experiment to production.
+### 6 - Deploy the Agent
+**Goal:** Package and deploy the forecasting agent as a DataRobot Agentic Workflow (custom inference model).
 * Programmatically packages the agent code and registers it as a Custom Model in DataRobot.
-* Deploys the agent to a prediction server, unlocking the Playground for user interaction and automated "LLM-as-a-Judge" evaluation metrics.
-
-### 6 - Prompt Management
-**Goal:** Decouple persona from code.
-* Demonstrates how to save, version, and manage system prompts externally.
-* Allows business users to update the agent's tone or instructions without requiring a code redeployment.
+* Deploys the agent to a serverless Prediction Environment, linking it to a Use Case for easy access and governance.
+* Uses DRUM entry points and artifact packaging to turn the agent into a deployable "model."
+* Runtime behavior (deployment IDs, dataset IDs, LLM model) is driven by runtime parameters / env vars, not hardcoded values.
 
 ### 7 - Custom Traces
-xxx
+**Goal:** Add observability to your agent by capturing LLM/tool activity as trace records.
+* Captures LLM/tool activity (latency, cost, tokens, status, metadata) as trace records.
+* Persists traces in DataRobot so you can monitor behavior over time.
+* Stores traces as a dataset in the AI Catalog and optionally pushes aggregated values into a Deployment's Custom Metrics for dashboards.
+* Turns "what happened during an agent run?" into queryable, auditable data for debugging, governance, and cost control.
 
 ---
 
 ## Getting Started
-1.  Open **Notebook 1** to authenticate and test your LLM connection.
-2.  Proceed sequentially to build up the agent's capabilities.
-3.  For the PDF demo notebook, ensure the sample PDF exists at `archive/ercot_market_briefing.pdf` (or update the notebook's `PDF_FILENAME`). The notebook will fall back to embedded sample text if the file/key are missing.
+1.  Set up your `.env` file (see [Environment Variables](#environment-variables) section above).
+2.  Open **Notebook 1 - LLM Gateway** to authenticate and test your LLM connection.
+3.  Proceed sequentially through the notebooks to build up the agent's capabilities.
+4.  For **Notebook 5 - PDF Onboarding**, ensure the sample PDF exists at `archive/ercot_market_briefing.pdf` (or update the notebook's `PDF_FILENAME`). The notebook will fall back to embedded sample text if the file/key are missing.
 
 ---
 
 ## Shared assets required to run the notebooks
 
 - **Python dependencies**: `requirements.txt`
-- **Core agent code**: `agent.py` (imported by the deployment packaging notebook)
+- **Environment variables**: `.env` file (see [Environment Variables](#environment-variables) section)
+- **Core agent code**: `agent.py` (created by Notebook 6 - Deploy the Agent)
 - **DataRobot assets (must exist in your tenant)**:
-  - Forecasting **deployment**: `6971b39b3fa6dde87d114a82`
-  - Forecasting **scoring dataset**: `6971bf6404e148a1b1b17c71`
+  - Forecasting **deployment**: Set `FORECAST_DEPLOYMENT_ID` in `.env`
+  - MCP **deployment**: Set `MCP_DEPLOYMENT_ID` in `.env`
+  - Training **dataset**: Set `ERCOT_TRAINING_DATASET_ID` in `.env`
+  - Scoring **dataset**: Set `SCORING_BASE_DATASET_ID` in `.env`
 - **Deployment packaging folder**: `agent_artifacts/`
   - Used/created by `6 - Deploy the Agent.ipynb`
   - Expected to contain (and is overwritten/created by the notebook): `custom.py`, `agent.py`, `requirements.txt`, plus packaging metadata like `pyproject.toml`
 - **Sample PDF for Document Intelligence**: `archive/ercot_market_briefing.pdf`
   - Used by `5 - PDF Onboarding (Aryn).ipynb`
-  - Optional: if missing (or if `ARYN_API_KEY` is not set), the notebook runs in a “simulation mode” using embedded fallback policy text
+  - Optional: if missing (or if `ARYN_API_KEY` is not set), the notebook runs in a "simulation mode" using embedded fallback policy text
