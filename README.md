@@ -33,9 +33,6 @@ pip install -r requirements.txt
    - `DATAROBOT_API_TOKEN`
    - Optional (used in some notebooks): `DATAROBOT_DEFAULT_USE_CASE`
 
-4. Optional (Document Intelligence / Aryn):
-   - `ARYN_API_KEY` (if not set, the PDF notebook will run in simulation mode)
-
 ### Environment Variables
 
 Create a `.env` file in the repository root with the following variables:
@@ -127,4 +124,4 @@ Replace placeholder values with your actual DataRobot dataset and deployment IDs
   - Expected to contain (and is overwritten/created by the notebook): `custom.py`, `agent.py`, `requirements.txt`, plus packaging metadata like `pyproject.toml`
 - **Sample PDF for Document Intelligence**: `archive/ercot_market_briefing.pdf`
   - Used by `5 - PDF Onboarding (Aryn).ipynb`
-  - Optional: if missing (or if `ARYN_API_KEY` is not set), the notebook runs in a "simulation mode" using embedded fallback policy text
+  - Optional: if missing, the notebook runs in a "simulation mode" using embedded fallback policy text
