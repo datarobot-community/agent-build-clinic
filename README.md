@@ -1,6 +1,6 @@
 # Agentic AI Building Blocks
 
-This repository contains a series of 7 "Agentic Blocks"—modular notebooks designed to demonstrate how to build, enhance, and deploy a production-ready AI Agent using DataRobot.
+This repository contains a series of 6 "Agentic Blocks"—modular notebooks designed to demonstrate how to build, enhance, and deploy a production-ready AI Agent using DataRobot.
 
 The goal is to move beyond simple chatbots by equipping an agent with predictive forecasting, structured data querying, and document intelligence.
 
@@ -101,13 +101,6 @@ Replace placeholder values with your actual DataRobot dataset and deployment IDs
 * Deploys the agent to a serverless Prediction Environment, linking it to a Use Case for easy access and governance.
 * Uses DRUM entry points and artifact packaging to turn the agent into a deployable "model."
 * Runtime behavior (deployment IDs, dataset IDs, LLM model) is driven by runtime parameters / env vars, not hardcoded values.
-
-### 7 - Custom Traces
-**Goal:** Add observability to your agent by capturing LLM/tool activity as trace records.
-* Captures LLM/tool activity (latency, cost, tokens, status, metadata) as trace records.
-* Persists traces in DataRobot so you can monitor behavior over time.
-* Stores traces as a dataset in the AI Catalog and optionally pushes aggregated values into a Deployment's Custom Metrics for dashboards.
-* Turns "what happened during an agent run?" into queryable, auditable data for debugging, governance, and cost control.
 
 ---
 
