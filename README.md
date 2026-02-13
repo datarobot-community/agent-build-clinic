@@ -34,6 +34,7 @@ See `.env.example` for the complete list. Key variables include:
 - `PROMPT_TEMPLATE_ID` (used by notebooks 2 and 4)
 - `MODEL_NAME` (LLM Gateway model ID)
 - `DATAROBOT_DEFAULT_USE_CASE` (optional; used for organization/governance in notebooks 5–6)
+- `PREDICTION_ENV_ID` (required for notebook 6; serverless Prediction Environment id in your tenant)
 
 Replace placeholder values with your actual DataRobot dataset and deployment IDs.
 
