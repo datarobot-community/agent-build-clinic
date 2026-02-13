@@ -10,7 +10,7 @@ The goal is to move beyond simple chatbots by equipping an agent with predictive
 
 ### Environment Variables
 
-Create a `.env` file in the repository root with the following variables:
+Create a `.env` file in the repository root. The notebooks call `load_dotenv()` so they will pick it up automatically.
 
 **For Codespace:**
 - Create `.env` in the workspace root
@@ -18,8 +18,7 @@ Create a `.env` file in the repository root with the following variables:
 
 **For Local:**
 - Create `.env` in the project root directory
-- Ensure your notebook environment loads `.env` files (most Jupyter setups do this automatically)
-- **Note:** For local development, you'll also need to set `DATAROBOT_ENDPOINT` and `DATAROBOT_API_TOKEN` (these are typically set automatically in Codespace)
+- **Note:** You must provide DataRobot credentials, either via environment variables (`DATAROBOT_ENDPOINT`, `DATAROBOT_API_TOKEN`) or via a local DataRobot config file used by the Python SDK.
 
 **Quick Setup:**
 ```bash
@@ -33,10 +32,20 @@ See `.env.example` for the complete list. Key variables include:
 - `ERCOT_TRAINING_DATASET_ID`
 - `FORECAST_DEPLOYMENT_ID`, `SCORING_DATASET_ID`, and `MCP_DEPLOYMENT_ID`
 - `PROMPT_TEMPLATE_ID` (used by notebooks 2 and 4)
-- `MODEL_NAME` (LLM Gateway model id)
+- `MODEL_NAME` (LLM Gateway model ID)
 - `DATAROBOT_DEFAULT_USE_CASE` (optional; used for organization/governance in notebooks 5–6)
 
 Replace placeholder values with your actual DataRobot dataset and deployment IDs.
+
+### Dependencies
+
+Notebook **1 - LLM Gateway** installs Python dependencies via `pip install -r requirements.txt`.
+
+If you run notebooks out of order (or only want to run one notebook), you may need to install dependencies first:
+
+```bash
+pip install -r requirements.txt
+```
 
 ---
 
@@ -45,7 +54,7 @@ Replace placeholder values with your actual DataRobot dataset and deployment IDs
 ### 1 - LLM Gateway
 **Goal:** Establish the foundation for the agent by connecting to the DataRobot LLM Gateway.
 * Connects to the DataRobot LLM Gateway.
-* Demonstrates how to access and switch between nearly 100 different LLMs (e.g., GPT-4, Claude, Gemini) using a single secure endpoint, eliminating the need to manage individual vendor API keys.
+* Demonstrates how to access and switch between more than 100 different LLMs (e.g., GPT-4, Claude, Gemini) using a single secure endpoint, eliminating the need to manage individual vendor API keys.
 
 ### 2 - Prompt Management
 **Goal:** Create, version, and programmatically retrieve a DataRobot Prompt Template.
@@ -55,13 +64,13 @@ Replace placeholder values with your actual DataRobot dataset and deployment IDs
 
 ### 3 - Advanced Data Tools
 **Goal:** Empower the agent to query enterprise data warehouses (like Snowflake) to answer factual business questions.
-* Uses the Model Context Protocol (MCP) to connect the agent to a DataRobot deployment acting as a secure "Data Tool."
-* Enables the agent to dynamically generate queries and retrieve live datasets—transforming it from a simple chatbot into a data analyst capable of answering questions like "What distinct bakeries are we tracking supplies for?"
+* Uses the Model Context Protocol (MCP) to connect the agent to a DataRobot deployment acting as a secure "Data Tool".
+* Enables the agent to dynamically generate queries and retrieve live datasets—transforming it from a simple chatbot into a data analyst capable of answering questions.
 
 ### 4 - Forecast Agent Tools
 **Goal:** Use the DataRobot forecast model deployment as a tool.
-* Defines a custom Tool Client that wraps a DataRobot Time Series deployment.
-* Allows the agent to recognize forward-looking questions (e.g., "How many croissants will we sell next Friday?") and delegate them to a forecasting model for accurate numerical answers.
+* Connects the agent to an MCP deployment that exposes forecasting tools, then prompts the LLM to call the appropriate forecast tool when the user asks forward-looking questions.
+* Optionally demonstrates using a managed DataRobot Prompt Template to keep the agent’s system prompt versioned and centrally managed.
 * LLMs cannot predict the future, but DataRobot can—this bridges Generative AI with Predictive AI.
 
 ### 5 - PDF Onboarding (Aryn)
@@ -74,7 +83,7 @@ Replace placeholder values with your actual DataRobot dataset and deployment IDs
 **Goal:** Package and deploy the forecasting agent as a DataRobot Agentic Workflow (custom inference model).
 * Programmatically packages the agent code and registers it as a Custom Model in DataRobot.
 * Deploys the agent to a serverless Prediction Environment, linking it to a Use Case for easy access and governance.
-* Uses DRUM entry points and artifact packaging to turn the agent into a deployable "model."
+* Uses DRUM entry points and artifact packaging to turn the agent into a deployable "model".
 * Runtime behavior (deployment IDs, dataset IDs, LLM model) is driven by runtime parameters / env vars, not hardcoded values.
 * **Tenant-specific config:** In the notebook, update `AGENT_NAME` / `REGISTERED_MODEL_NAME` (labels) and `PREDICTION_ENV_ID` (serverless environment) for your tenant as needed.
 
@@ -84,7 +93,7 @@ Replace placeholder values with your actual DataRobot dataset and deployment IDs
 1.  Set up your `.env` file (see [Environment Variables](#environment-variables) section above).
 2.  Open **Notebook 1 - LLM Gateway** to authenticate and test your LLM connection.
 3.  Proceed sequentially through the notebooks to build up the agent's capabilities.
-4.  For **Notebook 5 - PDF Onboarding**, ensure the sample PDF exists at `documents/ercot_market_briefing_enhanced.pdf` (or update the notebook’s `pdf_path` variable).
+4.  For **Notebook 5 - PDF Onboarding**, the sample PDF is included at `documents/ercot_market_briefing_enhanced.pdf` (or update the notebook’s `pdf_path` variable).
 
 ---
 
@@ -92,7 +101,6 @@ Replace placeholder values with your actual DataRobot dataset and deployment IDs
 
 - **Python dependencies**: `requirements.txt`
 - **Environment variables**: `.env` file (see [Environment Variables](#environment-variables) section)
-- **Core agent code**: `agent.py` (created by Notebook 6 - Deploy the Agent)
 - **DataRobot assets (must exist in your tenant)**:
   - Forecasting **deployment**: Set `FORECAST_DEPLOYMENT_ID` in `.env`
   - MCP **deployment**: Set `MCP_DEPLOYMENT_ID` in `.env`
@@ -101,6 +109,6 @@ Replace placeholder values with your actual DataRobot dataset and deployment IDs
   - Prompt template **ID**: Set `PROMPT_TEMPLATE_ID` in `.env` (if running notebooks 2 and/or 4)
 - **Deployment packaging folder**: `agent_artifacts/`
   - Used/created by `6 - Deploy the Agent.ipynb`
-  - Expected to contain (and is overwritten/created by the notebook): `custom.py`, `agent.py`, `requirements.txt`, plus packaging metadata like `pyproject.toml`
+  - Expected to contain: `custom.py`, `agent.py`, `requirements.txt`, plus packaging metadata like `pyproject.toml`
 - **Sample PDF for Document Intelligence**: `documents/ercot_market_briefing_enhanced.pdf`
   - Used by `5 - PDF Onboarding (Aryn).ipynb`
