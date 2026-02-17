@@ -69,7 +69,7 @@ pip install -r requirements.txt
 * Enables the agent to dynamically generate queries and retrieve live datasets—transforming it from a simple chatbot into a data analyst capable of answering questions.
 
 ### 4 - Forecast Agent Tools
-**Goal:** Use the DataRobot forecast model deployment as a tool.
+**Goal:** Use a DataRobot forecast model deployment as a tool.
 * Connects the agent to an MCP deployment that exposes forecasting tools, then prompts the LLM to call the appropriate forecast tool when the user asks forward-looking questions.
 * Optionally demonstrates using a managed DataRobot Prompt Template to keep the agent’s system prompt versioned and centrally managed.
 * LLMs cannot predict the future, but DataRobot can—this bridges Generative AI with Predictive AI.
