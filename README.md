@@ -63,9 +63,9 @@ pip install -r requirements.txt
 * Allows business users to update the agent's tone or instructions without requiring a code redeployment.
 * Prompts are treated as managed, versioned assets (not hardcoded strings).
 
-### 3 - Advanced Data Tools
+### 3 - DARIA Tools
 **Goal:** Empower the agent to query enterprise data warehouses (like Snowflake) to answer factual business questions.
-* Uses the Model Context Protocol (MCP) to connect the agent to a DataRobot deployment acting as a secure "Data Tool".
+* Uses the Model Context Protocol (MCP) to connect the agent to a DataRobot deployment.
 * Enables the agent to dynamically generate queries and retrieve live datasets—transforming it from a simple chatbot into a data analyst capable of answering questions.
 
 ### 4 - Forecast Agent Tools
