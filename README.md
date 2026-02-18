@@ -74,7 +74,7 @@ pip install -r requirements.txt
 * Optionally demonstrates using a managed DataRobot Prompt Template to keep the agent’s system prompt versioned and centrally managed.
 * LLMs cannot predict the future, but DataRobot can—this bridges Generative AI with Predictive AI.
 
-### 5 - PDF Onboarding (Aryn)
+### 5 - PDF Onboarding
 **Goal:** Enable the agent to answer questions grounded in unstructured PDF documents.
 * Creates (or reuses) a deployed **Vector Database (VDB)** from a PDF and queries it via MCP.
 * Implements a RAG (Retrieval Augmented Generation) workflow: retrieve relevant excerpts, then answer grounded in the document.
