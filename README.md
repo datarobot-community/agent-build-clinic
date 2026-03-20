@@ -10,15 +10,13 @@ The goal is to move beyond simple chatbots by equipping an agent with predictive
 
 ### MCP Server Setup (Optional Notebook 0)
 
-Before running MCP-enabled notebooks, either:
-- complete **0 - MCP Server Setup**, or
+Before running notebooks 1-6, either:
+- complete notebook **0 - MCP Server Setup**, OR
 - provide an existing `MCP_DEPLOYMENT_ID` in `.env`.
 
-This follows the simplified template flow from the DataRobot MCP component repository ([af-component-datarobot-mcp](https://github.com/datarobot-community/af-component-datarobot-mcp)):
-- `uvx copier copy git@github.com:datarobot/af-component-base.git .`
-- `uvx copier copy git@github.com:datarobot-community/af-component-datarobot-mcp.git .`
+Notebook 0 follows the simplified template flow from the DataRobot MCP component repository ([af-component-datarobot-mcp](https://github.com/datarobot-community/af-component-datarobot-mcp)).
 
-After deployment, set the resulting deployment ID as `MCP_DEPLOYMENT_ID` in your `.env`.
+After running notebook 0, set the resulting deployment ID as `MCP_DEPLOYMENT_ID` in your `.env`.
 
 ### Environment Variables
 
