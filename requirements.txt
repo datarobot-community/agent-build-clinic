@@ -8,5 +8,5 @@ aryn-sdk
 
 # MCP server setup
 uv
-task
+go-task-bin
 pulumi
