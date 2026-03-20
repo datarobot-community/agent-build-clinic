@@ -1,12 +1,24 @@
 # Agentic AI Building Blocks
 
-This repository contains a series of 6 "Agentic Blocks"—modular notebooks designed to demonstrate how to build, enhance, and deploy a production-ready AI Agent using DataRobot.
+This repository contains a series of 7 "Agentic Blocks"—modular notebooks designed to demonstrate how to build, enhance, and deploy a production-ready AI Agent using DataRobot.
 
 The goal is to move beyond simple chatbots by equipping an agent with predictive forecasting, structured data querying, and document intelligence.
 
 ---
 
 ## Setup
+
+### MCP Server Setup (Optional Notebook 0)
+
+Before running MCP-enabled notebooks, either:
+- complete **0 - MCP Server Setup**, or
+- provide an existing `MCP_DEPLOYMENT_ID` in `.env`.
+
+This follows the simplified template flow from the DataRobot MCP component repository ([af-component-datarobot-mcp](https://github.com/datarobot-community/af-component-datarobot-mcp)):
+- `uvx copier copy git@github.com:datarobot/af-component-base.git .`
+- `uvx copier copy git@github.com:datarobot-community/af-component-datarobot-mcp.git .`
+
+After deployment, set the resulting deployment ID as `MCP_DEPLOYMENT_ID` in your `.env`.
 
 ### Environment Variables
 
@@ -52,6 +64,11 @@ pip install -r requirements.txt
 
 ## Notebook Overview
 
+### 0 - MCP Server Setup
+**Goal:** Create and deploy an MCP server once, then reuse it across the rest of the workshop.
+* Uses the DataRobot MCP AF component setup flow from the template repository.
+* Produces the shared `MCP_DEPLOYMENT_ID` used by notebooks 3, 4, 5, and 6.
+
 ### 1 - LLM Gateway
 **Goal:** Establish the foundation for the agent by connecting to the DataRobot LLM Gateway.
 * Connects to the DataRobot LLM Gateway.
@@ -92,9 +109,11 @@ pip install -r requirements.txt
 
 ## Getting Started
 1.  Set up your `.env` file (see [Environment Variables](#environment-variables) section above).
-2.  Open **Notebook 1 - LLM Gateway** to authenticate and test your LLM connection.
-3.  Proceed sequentially through the notebooks to build up the agent's capabilities.
-4.  For **Notebook 5 - PDF Onboarding**, the sample PDF is included at `documents/ercot_market_briefing_enhanced.pdf` (or update the notebook’s `pdf_path` variable).
+2.  Optional: complete **Notebook 0 - MCP Server Setup** if you need to create/deploy an MCP server.
+3.  Ensure `MCP_DEPLOYMENT_ID` is set in `.env` (existing deployment IDs are supported).
+4.  Open **Notebook 1 - LLM Gateway** to authenticate and test your LLM connection.
+5.  Proceed sequentially through the notebooks to build up the agent's capabilities.
+6.  For **Notebook 5 - PDF Onboarding**, the sample PDF is included at `documents/ercot_market_briefing_enhanced.pdf` (or update the notebook’s `pdf_path` variable).
 
 ---
 
