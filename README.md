@@ -14,7 +14,7 @@ Before running notebooks 0-5, either:
 - complete notebook **0 - MCP Server Setup**, OR
 - provide an existing `MCP_DEPLOYMENT_ID` in `.env`.
 
-Notebook 0 follows the simplified template flow from the DataRobot MCP component repository ([af-component-datarobot-mcp](https://github.com/datarobot-community/af-component-datarobot-mcp)).
+Notebook 0 follows the simplified template flow from the DataRobot MCP component repository ([datarobot-mcp-template](https://github.com/datarobot-community/datarobot-mcp-template)).
 
 After running notebook 0, set the resulting deployment ID as `MCP_DEPLOYMENT_ID` in your `.env`.
 
