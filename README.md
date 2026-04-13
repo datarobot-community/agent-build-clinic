@@ -1,6 +1,6 @@
 # Agentic AI Building Blocks
 
-This repository contains a series of 7 "Agentic Blocks"—modular notebooks designed to demonstrate how to build, enhance, and deploy a production-ready AI Agent using DataRobot.
+This repository contains a series of 6 "Agentic Blocks"—modular notebooks designed to demonstrate how to build, enhance, and deploy a production-ready AI Agent using DataRobot.
 
 The goal is to move beyond simple chatbots by equipping an agent with predictive forecasting, structured data querying, and document intelligence.
 
@@ -10,7 +10,7 @@ The goal is to move beyond simple chatbots by equipping an agent with predictive
 
 ### MCP Server Setup (Optional Notebook 0)
 
-Before running notebooks 1-6, either:
+Before running notebooks 0-5, either:
 - complete notebook **0 - MCP Server Setup**, OR
 - provide an existing `MCP_DEPLOYMENT_ID` in `.env`.
 
@@ -43,8 +43,7 @@ See `.env.example` for the complete list. Key variables include:
 - `FORECAST_DEPLOYMENT_ID`, `SCORING_DATASET_ID`, and `MCP_DEPLOYMENT_ID`
 - `PROMPT_TEMPLATE_ID` (used by notebooks 2 and 4)
 - `MODEL_NAME` (LLM Gateway model ID)
-- `DATAROBOT_DEFAULT_USE_CASE` (optional; used for organization/governance in notebooks 5–6)
-- `PREDICTION_ENV_ID` (required for notebook 6; serverless Prediction Environment id in your tenant)
+- `PREDICTION_ENV_ID` (required for notebook 5; serverless Prediction Environment id in your tenant)
 
 Replace placeholder values with your actual DataRobot dataset and deployment IDs.
 
@@ -55,7 +54,7 @@ Notebook **1 - LLM Gateway** installs Python dependencies via `pip install -r re
 If you run notebooks out of order (or only want to run one notebook), you may need to install dependencies first:
 
 ```bash
-pip install -r requirements.txt
+pip install -q -r requirements.txt
 ```
 
 ---
@@ -65,7 +64,7 @@ pip install -r requirements.txt
 ### 0 - MCP Server Setup
 **Goal:** Create and deploy an MCP server once, then reuse it across the rest of the workshop.
 * Uses the DataRobot MCP AF component setup flow from the template repository.
-* Produces the shared `MCP_DEPLOYMENT_ID` used by notebooks 3, 4, 5, and 6.
+* Produces the shared `MCP_DEPLOYMENT_ID` used by notebooks 3, 4, and 5.
 
 ### 1 - LLM Gateway
 **Goal:** Establish the foundation for the agent by connecting to the DataRobot LLM Gateway.
@@ -89,19 +88,13 @@ pip install -r requirements.txt
 * Optionally demonstrates using a managed DataRobot Prompt Template to keep the agent’s system prompt versioned and centrally managed.
 * LLMs cannot predict the future, but DataRobot can—this bridges Generative AI with Predictive AI.
 
-### 5 - PDF Onboarding
-**Goal:** Enable the agent to answer questions grounded in unstructured PDF documents.
-* Creates (or reuses) a deployed **Vector Database (VDB)** from a PDF and queries it via MCP.
-* Implements a RAG (Retrieval Augmented Generation) workflow: retrieve relevant excerpts, then answer grounded in the document.
-* Example: Answer questions from the ERCOT market briefing PDF.
-
-### 6 - Deploy the Agent
+### 5 - Deploy the Agent
 **Goal:** Package and deploy the forecasting agent as a DataRobot Agentic Workflow (custom inference model).
 * Programmatically packages the agent code and registers it as a Custom Model in DataRobot.
 * Deploys the agent to a serverless Prediction Environment, linking it to a Use Case for easy access and governance.
 * Uses DRUM entry points and artifact packaging to turn the agent into a deployable "model".
 * Runtime behavior (deployment IDs, dataset IDs, LLM model) is driven by runtime parameters / env vars, not hardcoded values.
-* **Tenant-specific config:** In the notebook, update `AGENT_NAME` / `REGISTERED_MODEL_NAME` (labels) and `PREDICTION_ENV_ID` (serverless environment) for your tenant as needed.
+* **Tenant-specific config:** In the notebook, update `AGENT_NAME` / `REGISTERED_MODEL_NAME` (labels) and `PREDICTION_ENV_ID` (serverless environment) for your tenant as needed. If your workspace has no default Serverless Compute prediction environment, create a custom 'Serverless Compute' environment or choose another compatible prediction environment and use its ID.
 
 ---
 
@@ -111,7 +104,6 @@ pip install -r requirements.txt
 3.  Ensure `MCP_DEPLOYMENT_ID` is set in `.env` (existing deployment IDs are supported).
 4.  Open **Notebook 1 - LLM Gateway** to authenticate and test your LLM connection.
 5.  Proceed sequentially through the notebooks to build up the agent's capabilities.
-6.  For **Notebook 5 - PDF Onboarding**, the sample PDF is included at `documents/ercot_market_briefing_enhanced.pdf` (or update the notebook’s `pdf_path` variable).
 
 ---
 
@@ -125,9 +117,7 @@ pip install -r requirements.txt
   - Training **dataset**: Set `ERCOT_TRAINING_DATASET_ID` in `.env`
   - Forecast scoring **dataset**: Set `SCORING_DATASET_ID` in `.env`
   - Prompt template **ID**: Set `PROMPT_TEMPLATE_ID` in `.env` (if running notebooks 2 and 4)
-- **Sample PDF for document intelligence**: `documents/ercot_market_briefing_enhanced.pdf`
-  - Used by `5 - PDF Onboarding.ipynb`
 - **Deployment packaging folder**: `agent_artifacts/`
-  - Used/created by `6 - Deploy the Agent.ipynb`
-  - This folder is **generated by notebook 6**; it may be empty until you run the notebook.
-  - After running notebook 6, it is expected to contain: `custom.py`, `agent.py`, `requirements.txt`, plus build metadata like `pyproject.toml` (and additional generated files such as `uv.lock`, `model-metadata.yaml`)
+  - Used/created by `5 - Deploy the Agent.ipynb`
+  - This folder is **generated by notebook 5**; it may be empty until you run the notebook.
+  - After running notebook 5, it is expected to contain: `custom.py`, `agent.py`, `requirements.txt`, plus build metadata like `pyproject.toml` (and additional generated files such as `uv.lock`, `model-metadata.yaml`)
