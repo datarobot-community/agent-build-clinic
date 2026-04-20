@@ -5,3 +5,8 @@ pandas
 openai
 python-dotenv
 aryn-sdk
+
+# MCP server setup
+uv
+go-task-bin
+pulumi
