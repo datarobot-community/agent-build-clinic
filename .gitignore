@@ -2,3 +2,4 @@ archive/
 .env
 /draft/
 .idea/
+agent_artifacts/
