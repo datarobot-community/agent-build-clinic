@@ -49,12 +49,12 @@ Replace placeholder values with your actual DataRobot dataset and deployment IDs
 
 ### Dependencies
 
-Notebook **1 - LLM Gateway** installs Python dependencies via `pip install -r requirements.txt`.
+Notebook **1 - LLM Gateway** installs Python dependencies from the checked-in `uv.lock`.
 
 If you run notebooks out of order (or only want to run one notebook), you may need to install dependencies first:
 
 ```bash
-pip install -q -r requirements.txt
+uv export --format requirements.txt --locked --no-emit-project | uv pip install -q -r -
 ```
 
 ---
@@ -109,7 +109,7 @@ pip install -q -r requirements.txt
 
 ## Shared assets required to run the notebooks
 
-- **Python dependencies**: `requirements.txt`
+- **Python dependencies**: `pyproject.toml` and `uv.lock`
 - **Environment variables**: `.env` file (see [Environment Variables](#environment-variables) section)
 - **DataRobot assets (must exist in your tenant)**:
   - Forecasting **deployment**: Set `FORECAST_DEPLOYMENT_ID` in `.env`
