@@ -10,7 +10,7 @@ The goal is to move beyond simple chatbots by equipping an agent with predictive
 
 ### MCP Server Setup (Optional Notebook 0)
 
-Before running notebooks 0-5, either:
+Before running notebooks 3-5, either:
 - complete notebook **0 - MCP Server Setup**, OR
 - provide an existing `MCP_DEPLOYMENT_ID` in `.env`.
 
@@ -43,7 +43,7 @@ See `.env.example` for the complete list. Key variables include:
 - `FORECAST_DEPLOYMENT_ID`, `SCORING_DATASET_ID`, and `MCP_DEPLOYMENT_ID`
 - `PROMPT_TEMPLATE_ID` (used by notebooks 2 and 4)
 - `MODEL_NAME` (LLM Gateway model ID)
-- `PREDICTION_ENV_ID` (required for notebook 5; serverless Prediction Environment id in your tenant)
+- `CUSTOM_MODEL_NAME` and `REGISTERED_MODEL_NAME` (used by notebook 5; include a unique suffix such as your initials)
 
 Replace placeholder values with your actual DataRobot dataset and deployment IDs.
 
@@ -77,7 +77,7 @@ uv export --format requirements.txt --locked --no-emit-project | uv pip install 
 * Allows business users to update the agent's tone or instructions without requiring a code redeployment.
 * Prompts are treated as managed, versioned assets (not hardcoded strings).
 
-### 3 - DARIA Tools
+### 3 - DataRobot Tools
 **Goal:** Empower the agent to query enterprise data warehouses (like Snowflake) to answer factual business questions.
 * Uses the Model Context Protocol (MCP) to connect the agent to a DataRobot deployment.
 * Enables the agent to dynamically generate queries and retrieve live datasets—transforming it from a simple chatbot into a data analyst capable of answering questions.
@@ -94,16 +94,16 @@ uv export --format requirements.txt --locked --no-emit-project | uv pip install 
 * Deploys the agent to a serverless Prediction Environment, linking it to a Use Case for easy access and governance.
 * Uses DRUM entry points and artifact packaging to turn the agent into a deployable "model".
 * Runtime behavior (deployment IDs, dataset IDs, LLM model) is driven by runtime parameters / env vars, not hardcoded values.
-* **Tenant-specific config:** In the notebook, update `AGENT_NAME` / `REGISTERED_MODEL_NAME` (labels) and `PREDICTION_ENV_ID` (serverless environment) for your tenant as needed. If your workspace has no default Serverless Compute prediction environment, create a custom 'Serverless Compute' environment or choose another compatible prediction environment and use its ID.
+* **Tenant-specific config:** In `.env`, update `CUSTOM_MODEL_NAME` / `REGISTERED_MODEL_NAME` (labels) for your tenant as needed. Notebook 5 auto-selects the shared `Serverless Compute` prediction environment by name; if your workspace has no default Serverless Compute prediction environment, create a compatible environment named `Serverless Compute`.
 
 ---
 
 ## Getting Started
 1.  Set up your `.env` file (see [Environment Variables](#environment-variables) section above).
-2.  Optional: complete **Notebook 0 - MCP Server Setup** if you need to create/deploy an MCP server.
-3.  Ensure `MCP_DEPLOYMENT_ID` is set in `.env` (existing deployment IDs are supported).
-4.  Open **Notebook 1 - LLM Gateway** to authenticate and test your LLM connection.
-5.  Proceed sequentially through the notebooks to build up the agent's capabilities.
+2.  Open **Notebook 1 - LLM Gateway** to authenticate and test your LLM connection.
+3.  Proceed sequentially through notebooks 1 and 2 to build the foundation.
+4.  Before notebook 3, complete **Notebook 0 - MCP Server Setup** if you need to create/deploy an MCP server, or set an existing `MCP_DEPLOYMENT_ID` in `.env`.
+5.  Continue through notebooks 3-5 to add tools, forecasting, and deployment.
 
 ---
 
