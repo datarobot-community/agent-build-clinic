@@ -3,11 +3,9 @@ name = "agent-build-clinic"
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
-    "aryn-sdk>=0.2.15",
     "datarobot>=3.15.0",
     "go-task-bin>=3.50.0",
     "openai>=2.36.0",
-    "pandas>=3.0.3",
     "pulumi>=3.223.0",
     "pydantic>=2.13.4",
     "pydantic-ai>=1.44.0",
