@@ -103,11 +103,13 @@ uv export --format requirements.txt --locked --no-emit-project | uv pip install 
 ---
 
 ## Getting Started
-1.  Set up your `.env` file (see [Environment Variables](#environment-variables) section above).
-2.  Open **Notebook 1 - LLM Gateway** to authenticate and test your LLM connection.
-3.  Proceed sequentially through notebooks 1 and 2 to build the foundation.
-4.  Before notebook 3, complete **Notebook 0 - MCP Server Setup** if you need to create/deploy an MCP server, or set an existing `MCP_DEPLOYMENT_ID` in `.env`.
-5.  Continue through notebooks 3-5 to add tools, forecasting, and deployment.
+Run the notebooks in order. Notebook 0 is optional setup-only, but it must be completed before notebook 3 unless you already have an `MCP_DEPLOYMENT_ID`.
+
+1. Set up your `.env` file (see [Environment Variables](#environment-variables) section above).
+2. Run **1 - LLM Gateway** to authenticate and test your LLM connection.
+3. Run **2 - Prompt Management** to create or retrieve the managed prompt template.
+4. Before notebook 3, complete **0 - MCP Server Setup** if you need to create/deploy an MCP server, or set an existing `MCP_DEPLOYMENT_ID` in `.env`.
+5. Run **3 - DataRobot Tools**, **4 - Forecast Agent Tools**, and **5 - Deploy the Agent** in order.
 
 ---
 
