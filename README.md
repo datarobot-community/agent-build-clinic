@@ -49,9 +49,13 @@ Replace placeholder values with your actual DataRobot dataset and deployment IDs
 
 ### Dependencies
 
-Notebook **1 - LLM Gateway** installs Python dependencies from the checked-in `uv.lock`.
+Notebooks **0 - MCP Server Setup** and **1 - LLM Gateway** include a lightweight install cell for the agent package used in the exercises:
 
-If you run notebooks out of order (or only want to run one notebook), you may need to install dependencies first:
+```bash
+uv pip install pydantic-ai -q
+```
+
+If you run notebooks in a fresh local environment, out of order, or outside a preconfigured DataRobot notebook environment, install the full checked-in dependency set first:
 
 ```bash
 uv export --format requirements.txt --locked --no-emit-project | uv pip install -q -r -
