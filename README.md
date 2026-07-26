@@ -1,129 +1,344 @@
-# Agentic AI Building Blocks
+<p align="center">
+  <a href="https://github.com/datarobot-community/datarobot-agent-application">
+    <img src="./.github/datarobot_logo.avif" width="600px" alt="DataRobot Logo"/>
+  </a>
+</p>
+<p align="center">
+    <span style="font-size: 1.5em; font-weight: bold; display: block;">ABC Forecast App — Agent Build Clinic</span>
+</p>
 
-This repository contains a series of 6 "Agentic Blocks"—modular notebooks designed to demonstrate how to build, enhance, and deploy a production-ready AI Agent using DataRobot.
+<p align="center">
+  <a href="https://datarobot.com">Homepage</a>
+  ·
+  <a href="https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/index.html">Documentation</a>
+  ·
+  <a href="https://docs.datarobot.com/en/docs/get-started/troubleshooting/general-help.html">Support</a>
+</p>
 
-The goal is to move beyond simple chatbots by equipping an agent with predictive forecasting and structured data querying.
+This repository is the **reference implementation** for the DataRobot **Agent Build Clinic** ERCOT day-ahead market (DAM) use case. It is built on the [DataRobot Agent Application template](https://github.com/datarobot-community/datarobot-agent-application) and includes:
 
----
+- A **LangGraph agent** with ERCOT-specific tools (`get_dam_prices`, `predict_dam_prices`, accuracy metrics, and miss analysis)
+- A **FastAPI backend** with ERCOT data and analyst APIs
+- A **React frontend** with Forecast Assistant and Analyst views
+- **DataRobot Global MCP** for platform tools (no local `mcp_server/` component)
 
-## Setup
+Participants in the clinic replicate this app using the prompts in [`prompts/`](prompts/README.md). The full agent design is documented in [`agent_spec.md`](agent_spec.md).
 
-### MCP Server Setup (Optional Notebook 0)
+> [!NOTE]
+> This app uses **DataRobot Global MCP**, not a standalone MCP server deployment. Do not set `MCP_DEPLOYMENT_ID`.
 
-Before running notebooks 3-5, either:
-- complete notebook **0 - MCP Server Setup**, OR
-- provide an existing `MCP_DEPLOYMENT_ID` in `.env`.
+# Table of contents
 
-Notebook 0 follows the simplified template flow from the DataRobot MCP component repository ([datarobot-mcp-template](https://github.com/datarobot-community/datarobot-mcp-template)).
+- [Architecture](#architecture)
+- [Quick start](#quick-start)
+  - [Prerequisite tools](#prerequisite-tools)
+  - [Configure environment](#configure-environment)
+  - [Install dependencies](#install-dependencies)
+  - [Run locally](#run-locally)
+- [Clinic workflow](#clinic-workflow)
+- [Develop and customize](#develop-and-customize)
+- [Deploy](#deploy)
+- [Global MCP](#global-mcp)
+- [Troubleshooting](#troubleshooting)
+- [Get help](#get-help)
 
-After running notebook 0, set the resulting deployment ID as `MCP_DEPLOYMENT_ID` in your `.env`.
+For template-level changes, see [CHANGELOG](CHANGELOG.md).
 
-### Environment Variables
+# Architecture
 
-Create a `.env` file in the repository root. The notebooks call `load_dotenv()` so they will pick it up automatically.
-
-**For Codespace:**
-- Create `.env` in the workspace root
-- The file will be automatically loaded by the notebooks
-
-**For Local:**
-- Create `.env` in the project root directory
-- **Note:** You must provide DataRobot credentials, either via environment variables (`DATAROBOT_ENDPOINT`, `DATAROBOT_API_TOKEN`) or via a local DataRobot config file used by the Python SDK.
-
-**Quick Setup:**
-```bash
-# Copy the example file and fill in your values
-cp .env.example .env
+```
+┌─────────────────┐     ┌──────────────────┐     ┌─────────────────────────┐
+│  frontend_web   │────▶│  fastapi_server  │────▶│  agent (LangGraph)      │
+│  React + Vite   │     │  REST + AG-UI    │     │  ERCOT tools + Global MCP│
+└─────────────────┘     └──────────────────┘     └─────────────────────────┘
+        :5173                    :8080                      :8842
 ```
 
-**Required Variables:**
-See `.env.example` for the complete list. Key variables include:
-- `DATAROBOT_ENDPOINT` and `DATAROBOT_API_TOKEN` (required for local development)
-- `ERCOT_TRAINING_DATASET_ID`
-- `FORECAST_DEPLOYMENT_ID`, `SCORING_DATASET_ID`, and `MCP_DEPLOYMENT_ID`
-- `PROMPT_TEMPLATE_ID` (used by notebooks 2 and 4)
-- `MODEL_NAME` (LLM Gateway model ID)
-- `CUSTOM_MODEL_NAME` and `REGISTERED_MODEL_NAME` (used by notebook 5; include a unique suffix such as your initials)
+| Component | Path | Purpose |
+|-----------|------|---------|
+| Agent | `agent/agent/` | LangGraph agent, ERCOT tools, prompt |
+| Backend | `fastapi_server/` | Chat API, ERCOT endpoints, auth |
+| Frontend | `frontend_web/` | Forecast Assistant + Analyst UI |
+| Infra | `infra/` | Pulumi deployment to DataRobot |
 
-Replace placeholder values with your actual DataRobot dataset and deployment IDs.
+# Quick start
 
-### Dependencies
+> [!CAUTION]
+> macOS and Linux only. On Windows, use a [DataRobot codespace](https://docs.datarobot.com/en/docs/workbench/wb-notebook/codespaces/index.html) or WSL.
 
-Notebooks **0 - MCP Server Setup** and **1 - LLM Gateway** include a lightweight install cell for the agent package used in the exercises:
+## Prerequisite tools
 
-```bash
-uv pip install pydantic-ai -q
+| Tool | Version | Description |
+|------|---------|-------------|
+| **dr** (DataRobot CLI) | >= 0.2.55 | Templates, auth, task execution |
+| **git** | >= 2.30.0 | Version control |
+| **uv** | >= 0.9.0 | Python package manager |
+| **Pulumi** | >= 3.163.0 | Infrastructure as Code |
+| **Taskfile** | >= 3.43.3 | Task runner |
+| **Node.js** | >= 24 | Frontend development |
+
+Install on macOS with Homebrew:
+
+```sh
+brew install datarobot-oss/taps/dr-cli uv pulumi/tap/pulumi go-task node git
 ```
 
-If you run notebooks in a fresh local environment, out of order, or outside a preconfigured DataRobot notebook environment, install the full checked-in dependency set first:
+Verify:
 
-```bash
-uv export --format requirements.txt --locked --no-emit-project | uv pip install -q -r -
+```sh
+dr --version && uv --version && pulumi version && task --version && node --version
 ```
 
----
+> [!TIP]
+> After installing `uv`, run `uv tool update-shell` once so your shell picks up the updated `PATH`.
 
-## Notebook Overview
+> [!NOTE]
+> If you do not have a Pulumi account, use `pulumi login --local` or create a free account at [app.pulumi.com](https://app.pulumi.com/signup).
 
-### 0 - MCP Server Setup
-**Goal:** Create and deploy an MCP server once, then reuse it across the rest of the workshop.
-* Uses the DataRobot MCP AF component setup flow from the template repository.
-* Produces the shared `MCP_DEPLOYMENT_ID` used by notebooks 3, 4, and 5.
+## Configure environment
 
-### 1 - LLM Gateway
-**Goal:** Establish the foundation for the agent by connecting to the DataRobot LLM Gateway.
-* Connects to the DataRobot LLM Gateway.
-* Demonstrates how to access and switch between more than 100 different LLMs (e.g., GPT-4, Claude, Gemini) using a single secure endpoint, eliminating the need to manage individual vendor API keys.
+Copy the template and fill in your values:
 
-### 2 - Prompt Management
-**Goal:** Create, version, and programmatically retrieve a DataRobot Prompt Template.
-* Demonstrates how to save, version, and manage system prompts externally in DataRobot.
-* Allows business users to update the agent's tone or instructions without requiring a code redeployment.
-* Prompts are treated as managed, versioned assets (not hardcoded strings).
+```sh
+cp .env.template .env
+```
 
-### 3 - DataRobot Tools
-**Goal:** Empower the agent to query enterprise data warehouses (like Snowflake) to answer factual business questions.
-* Uses the Model Context Protocol (MCP) to connect the agent to a DataRobot deployment.
-* Enables the agent to dynamically generate queries and retrieve live datasets—transforming it from a simple chatbot into a data analyst capable of answering questions.
+Required variables:
 
-### 4 - Forecast Agent Tools
-**Goal:** Use a DataRobot forecast model deployment as a tool.
-* Connects the agent to an MCP deployment that exposes forecasting tools, then prompts the LLM to call the appropriate forecast tool when the user asks forward-looking questions.
-* Optionally demonstrates using a managed DataRobot Prompt Template to keep the agent’s system prompt versioned and centrally managed.
-* LLMs cannot predict the future, but DataRobot can—this bridges Generative AI with Predictive AI.
+| Variable | Description |
+|----------|-------------|
+| `DATAROBOT_API_TOKEN` | Your DataRobot API token |
+| `DATAROBOT_ENDPOINT` | e.g. `https://app.datarobot.com/api/v2` |
+| `SESSION_SECRET_KEY` | Random string for session signing |
+| `ERCOT_DEPLOYMENT_ID` | Deployed time-series forecast model ID |
+| `ERCOT_DATASET_ID` | ERCOT training dataset ID (historical DAM + weather) |
+| `EXTERNAL_MCP_URL` | Global MCP endpoint for your DataRobot host |
+| `EXTERNAL_MCP_HEADERS` | `{"Authorization": "Bearer <DATAROBOT_API_TOKEN>"}` |
+| `EXTERNAL_MCP_TRANSPORT` | `streamable-http` |
 
-### 5 - Deploy the Agent
-**Goal:** Package and deploy the forecasting agent as a DataRobot Agentic Workflow (custom inference model).
-* Programmatically packages the agent code and registers it as a Custom Model in DataRobot.
-* Deploys the agent to a serverless Prediction Environment, linking it to a Use Case for easy access and governance.
-* Uses DRUM entry points and artifact packaging to turn the agent into a deployable "model".
-* Runtime behavior (deployment IDs, dataset IDs, LLM model) is driven by runtime parameters / env vars, not hardcoded values.
-* **Tenant-specific config:** In `.env`, update `CUSTOM_MODEL_NAME` / `REGISTERED_MODEL_NAME` (labels) for your tenant as needed. Notebook 5 auto-selects the shared `Serverless Compute` prediction environment by name; if your workspace has no default Serverless Compute prediction environment, create a compatible environment named `Serverless Compute`.
+Generate a session secret:
 
----
+```sh
+python -c "import os, binascii; print(binascii.hexlify(os.urandom(64)).decode())"
+```
 
-## Getting Started
-Run the notebooks in order. Notebook 0 is optional setup-only, but it must be completed before notebook 3 unless you already have an `MCP_DEPLOYMENT_ID`.
+Validate credentials:
 
-1. Set up your `.env` file (see [Environment Variables](#environment-variables) section above).
-2. Run **1 - LLM Gateway** to authenticate and test your LLM connection.
-3. Run **2 - Prompt Management** to create or retrieve the managed prompt template.
-4. Before notebook 3, complete **0 - MCP Server Setup** if you need to create/deploy an MCP server, or set an existing `MCP_DEPLOYMENT_ID` in `.env`.
-5. Run **3 - DataRobot Tools**, **4 - Forecast Agent Tools**, and **5 - Deploy the Agent** in order.
+```sh
+dr auth check
+```
 
----
+For instructor-led setup details, see [`prompts/INSTRUCTOR-env-setup.md`](prompts/INSTRUCTOR-env-setup.md).
 
-## Shared assets required to run the notebooks
+If you are starting from scratch (not this repo), you can also run `dr start` to walk through the template wizard. This clinic repo is already configured — use `.env.template` as the guide.
 
-- **Python dependencies**: `pyproject.toml` and `uv.lock`
-- **Environment variables**: `.env` file (see [Environment Variables](#environment-variables) section)
-- **DataRobot assets (must exist in your tenant)**:
-  - Forecasting **deployment**: Set `FORECAST_DEPLOYMENT_ID` in `.env`
-  - MCP **deployment**: Set `MCP_DEPLOYMENT_ID` in `.env`
-  - Training **dataset**: Set `ERCOT_TRAINING_DATASET_ID` in `.env`
-  - Forecast scoring **dataset**: Set `SCORING_DATASET_ID` in `.env`
-  - Prompt template **ID**: Set `PROMPT_TEMPLATE_ID` in `.env` (if running notebooks 2 and 4)
-- **Deployment packaging folder**: `agent_artifacts/`
-  - Used/created by `5 - Deploy the Agent.ipynb`
-  - This folder is **generated by notebook 5**; it may be empty until you run the notebook.
-  - After running notebook 5, it is expected to contain: `custom.py`, `agent.py`, `requirements.txt`, plus build metadata like `pyproject.toml` (and additional generated files such as `uv.lock`, `model-metadata.yaml`)
+## Install dependencies
+
+From the project root:
+
+```sh
+dr task run install
+```
+
+> [!IMPORTANT]
+> Do not copy `.venv` folders between machines or projects. Always run `dr task run install` in this directory so virtualenvs point at the correct paths.
+
+## Run locally
+
+Start all services:
+
+```sh
+dr run dev
+```
+
+This starts three processes:
+
+| Service | Port | URL |
+|---------|------|-----|
+| Frontend (Vite) | 5173 | http://localhost:5173 |
+| Backend (FastAPI) | 8080 | http://localhost:8080 |
+| Agent | 8842 | http://localhost:8842 |
+
+Open http://localhost:5173 and ask a question such as:
+
+> Show HB_HOUSTON day-ahead prices for the last 7 days.
+
+You can also start individual services:
+
+```sh
+dr run agent:dev
+dr run fastapi_server:dev
+dr run frontend_web:dev
+```
+
+# Clinic workflow
+
+The clinic follows a three-phase **define → code → deploy** flow. Prompt files live in [`prompts/`](prompts/README.md):
+
+| Phase | Prompt | Output |
+|-------|--------|--------|
+| 1. Define | `01-define-agent.md` | `agent_spec.md` |
+| 2. Code | `02-code-agent.md` | Agent, backend, frontend |
+| 3. Deploy | `03-deploy.md` | DataRobot deployment |
+
+Between phases 2 and 3, participants configure `.env` manually (instructor-led). See [`prompts/INSTRUCTOR-env-setup.md`](prompts/INSTRUCTOR-env-setup.md).
+
+# Develop and customize
+
+## Agent
+
+The agent lives in `agent/agent/`:
+
+| File | Purpose |
+|------|---------|
+| `myagent.py` | LangGraph graph, system prompt, MCP + ERCOT tool wiring |
+| `ercot_tools.py` | `get_dam_prices`, `predict_dam_prices`, accuracy and analysis tools |
+| `config.py` | Agent configuration |
+
+After agent changes:
+
+```sh
+dr task run agent:install
+dr task run agent:lint
+dr task run agent:test
+```
+
+See [AGENTS.md](AGENTS.md) and [docs/agent/README.md](docs/agent/README.md) for framework details.
+
+## Backend and frontend
+
+- ERCOT REST endpoints: `fastapi_server/app/api/v1/ercot.py`
+- Forecast Assistant UI: `frontend_web/src/pages/ForecastAssistantPage.tsx`
+- Analyst UI: `frontend_web/src/pages/AnalystPage.tsx`
+
+After changes:
+
+```sh
+dr task run fastapi_server:lint
+dr task run frontend_web:lint
+```
+
+## Run all tests
+
+```sh
+dr task run test
+```
+
+# Deploy
+
+Deploy to DataRobot (requires Pulumi login):
+
+```sh
+dr task run infra:up-yes
+```
+
+Or:
+
+```sh
+dr run deploy
+```
+
+Ensure `PULUMI_STACK_NAME` in `.env` matches an existing stack in `infra/`:
+
+```sh
+cd infra && pulumi stack ls
+```
+
+Post-deploy validation:
+
+```sh
+task agent:cli -- execute-deployment \
+  --user_prompt "Show HB_HOUSTON DAM prices for the last 7 days" \
+  --deployment_id <deployment_id>
+```
+
+# Global MCP
+
+This application does **not** ship a local `mcp_server/` component. Platform tools (predictions, catalog, etc.) are accessed through **DataRobot Global MCP**.
+
+Configure in `.env`:
+
+```shell
+EXTERNAL_MCP_URL=https://{DATAROBOT_URL}/api/v2/genai/globalmcp/mcp
+EXTERNAL_MCP_HEADERS={"Authorization": "Bearer <DATAROBOT_API_TOKEN>"}
+EXTERNAL_MCP_TRANSPORT=streamable-http
+```
+
+- Do **not** set `MCP_DEPLOYMENT_ID`.
+- ERCOT DAM **forecasts** must use the `predict_dam_prices` tool (time-series batch scoring with `ERCOT_DEPLOYMENT_ID`). Global MCP generic prediction tools are not suitable for this deployment.
+
+See [docs/mcp-server.md](docs/mcp-server.md) and [AGENTS.md](AGENTS.md#mcp--global-mcp).
+
+# Troubleshooting
+
+## Ports reference
+
+| Port | Component | Configurable |
+|------|-----------|--------------|
+| 8080 | FastAPI backend | No |
+| 5173 | Vite dev server | No |
+| 8842 | Agent endpoint | Yes (`AGENT_PORT` in `.env`) |
+
+### Port conflicts
+
+```sh
+lsof -i :8080
+lsof -i :5173
+lsof -i :8842
+```
+
+Stop the conflicting process or free the port before running `dr run dev`.
+
+### DataRobot codespace ports
+
+Expose ports 8080, 5173, and 8842 in the codespace **Session Environment** settings. See [docs/img/codespace-ports.png](docs/img/codespace-ports.png).
+
+## Common issues
+
+### Services won't start
+
+1. Verify prerequisites: `dr --version`, `uv --version`, `node --version`
+2. Reinstall dependencies: `dr task run install`
+3. Check `.env` has all required variables (see [Configure environment](#configure-environment))
+4. Validate auth: `dr auth check`
+
+### Stale virtualenv after copying the project
+
+If tests or scripts reference another project's path (e.g. `abc-forecast-app`), remove and recreate venvs:
+
+```sh
+rm -rf agent/.venv fastapi_server/.venv
+dr task run install
+```
+
+### Agent can't reach MCP or forecast tools fail
+
+1. Confirm `EXTERNAL_MCP_URL` and `EXTERNAL_MCP_HEADERS` are set with a valid token
+2. Confirm `ERCOT_DEPLOYMENT_ID` and `ERCOT_DATASET_ID` are set
+3. Use `predict_dam_prices` for forecasts — not Global MCP generic prediction tools
+
+### Pulumi stack not found
+
+```sh
+cd infra
+pulumi stack ls
+pulumi stack select <stack-name>   # or create one
+```
+
+Update `PULUMI_STACK_NAME` in `.env` to match.
+
+### Frontend build issues
+
+```sh
+cd frontend_web
+rm -rf node_modules dist
+dr task run frontend_web:install
+```
+
+# Get help
+
+- [Agent spec](agent_spec.md) — clinic design reference
+- [Clinic prompts](prompts/README.md) — participant workflow
+- [DataRobot agentic documentation](https://docs.datarobot.com/en/docs/agentic-ai/agentic-develop/index.html)
+- [DataRobot CLI (`dr`) documentation](https://github.com/datarobot-oss/cli)
+- [DataRobot support](https://docs.datarobot.com/en/docs/get-started/troubleshooting/general-help.html)
