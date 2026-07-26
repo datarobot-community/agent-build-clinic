@@ -58,4 +58,4 @@ Local testing happens **after** Prompt 2, once participants manually configure `
 
 ## Reference implementation
 
-This repo (`abc-forecast-app`) is the canonical example. Participants replicate it using these prompts — they should not copy the repo during the exercise.
+This repo (`agent-build-clinic`) is the canonical example. Participants replicate it using these prompts — they should not copy the repo during the exercise.
