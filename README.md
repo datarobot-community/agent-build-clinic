@@ -1,6 +1,6 @@
 # Agentic AI Building Blocks
 
-This repository contains a series of 6 "Agentic Blocks"—modular notebooks designed to demonstrate how to build, enhance, and deploy a production-ready AI Agent using DataRobot.
+This repository contains a series of "Agentic Blocks"—modular notebooks designed to demonstrate how to build, enhance, and deploy a production-ready AI Agent using DataRobot.
 
 The goal is to move beyond simple chatbots by equipping an agent with predictive forecasting and structured data querying.
 
