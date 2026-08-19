@@ -3,4 +3,5 @@ archive/
 /draft/
 .idea/
 agent_artifacts/
+/.config/
 datarobot-mcp-template/.config/

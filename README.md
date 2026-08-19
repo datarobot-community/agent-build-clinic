@@ -1,6 +1,6 @@
 # Agentic AI Building Blocks
 
-This repository contains a series of 6 "Agentic Blocks"—modular notebooks designed to demonstrate how to build, enhance, and deploy a production-ready AI Agent using DataRobot.
+This repository contains a series of "Agentic Blocks"—modular notebooks designed to demonstrate how to build, enhance, and deploy a production-ready AI Agent using DataRobot.
 
 The goal is to move beyond simple chatbots by equipping an agent with predictive forecasting and structured data querying.
 
@@ -49,17 +49,14 @@ Replace placeholder values with your actual DataRobot dataset and deployment IDs
 
 ### Dependencies
 
-Notebooks **0 - MCP Server Setup** and **1 - LLM Gateway** include a lightweight install cell for the agent package used in the exercises:
+Notebook **1 - LLM Gateway** includes an install cell that installs the full checked-in dependency set from the lockfile:
 
 ```bash
-uv pip install pydantic-ai -q
+uv export --format requirements.txt --locked --no-emit-project --no-hashes --no-annotate --no-header -o /tmp/agent-build-clinic-requirements.txt
+uv pip install -q -r /tmp/agent-build-clinic-requirements.txt
 ```
 
-If you run notebooks in a fresh local environment, out of order, or outside a preconfigured DataRobot notebook environment, install the full checked-in dependency set first:
-
-```bash
-uv export --format requirements.txt --locked --no-emit-project | uv pip install -q -r -
-```
+If you run notebooks in a fresh local environment, out of order, or outside a preconfigured DataRobot notebook environment, run the same command first.
 
 ---
 
